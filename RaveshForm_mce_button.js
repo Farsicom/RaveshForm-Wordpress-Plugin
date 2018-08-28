@@ -1,9 +1,10 @@
 (function () {
     var rvc = new RaveshFrameWork();
-    var rvcLang = rvc.getCookie('language');
-    if (rvcLang === 'fa_IR') rvcLang = 'fa'; else rvcLang = 'en';
-    var iconUrl = '../wp-content/plugins/RaveshFormBuilder/RaveshForm_logo.png';
 
+
+    var rvcLang =languagePosted;
+    if (rvcLang === 'fa_IR') rvcLang = 'fa'; else rvcLang = 'en';
+    var iconUrl = IconUrlPosted;
 
     //Resources -----------------------
     var rvcResource = {
