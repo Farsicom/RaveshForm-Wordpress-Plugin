@@ -20,9 +20,9 @@ if (class_exists("CrmPluginSeries")) {
     $dl_pluginSeries = new CrmPluginSeries();
 }
 
+
 if (isset($dl_pluginSeries)) {
 
-    setcookie('language', get_locale());
 
     function replaceShortCode($atts)
     {
@@ -70,7 +70,15 @@ if (isset($dl_pluginSeries)) {
     add_action('admin_head', 'add_ravesh_button_to_mce');
     function add_ravesh_tinymce_plugin($plugin_array)
     {
-        $plugin_array['my_mce_button'] = plugin_dir_url('RaveshForm_mce_button.js') . 'RaveshFormBuilder/RaveshForm_mce_button.js';
+
+        $language=get_locale();
+        $iconUrl=plugins_url( 'RaveshForm_logo.png', __FILE__ );
+
+        echo "<script type='text/javascript'>var IconUrlPosted='$iconUrl'</script>";
+        echo "<script type='text/javascript'>var languagePosted='$language'</script>";
+
+
+         $plugin_array['my_mce_button'] =plugins_url( 'RaveshForm_mce_button.js', __FILE__ );
         return $plugin_array;
     }
 
