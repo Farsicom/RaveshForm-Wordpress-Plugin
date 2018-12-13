@@ -1,10 +1,12 @@
-(function () {
+﻿(function () {
     var rvc = new RaveshFrameWork();
 
 
-    var rvcLang =languagePosted;
+    var rvcLang = RaveshFormLang;
     if (rvcLang === 'fa_IR') rvcLang = 'fa'; else rvcLang = 'en';
-    var iconUrl = IconUrlPosted;
+    var isCRM = RaveshFormIsCRM === 'true';
+    var isFormican = RaveshFormIsFormican === 'true';
+    var iconUrl = RaveshFormPath + (isCRM ? 'RaveshForm_logo.png' : 'RaveshForm_logo2.png');
 
     //Resources -----------------------
     var rvcResource = {
@@ -14,20 +16,24 @@
             floatRight: 'right',
             modalTitle: 'فرم‌ساز <span style="color: #03a9f4">روش</span>',
             modalDescription: 'افزونه‌ی اتصال وردپرس به فرم‌ساز رَوش',
+            modalTitle2: 'فرم‌ساز <span style="color: #03a9f4">فرم‌افزار</span>',
+            modalDescription2: 'افزونه‌ی اتصال وردپرس به فرم‌افزار',
             showTypeInline: 'اسکریپت',
             showTypeDialog: 'نمایش پنجره',
             showTypeLink: 'لینک',
             showTypeFab: 'دکمه شناور',
             serverUrl: 'آدرس سرور',
             domain: 'نام دامنه',
-            formId: 'شناسه فرم',
+            domain2: 'شناسه‌ی امنیتی',
+            formId: 'شناسه‌ی فرم',
             showType: 'نحوه نمایش',
             linkTitle: 'عنوان',
             iconTitle: 'افزودن فرم',
             create: 'ایجاد',
             viewForm: 'مشاهده‌ی فرم',
             enterDomain: 'نام دامنه را وارد نمایید.',
-            enterServerUrl: 'آدرس سرور را  وارد نمایید.',
+            enterDomain2: 'شناسه‌ی امنیتی را وارد نمایید.',
+            enterServerUrl: 'آدرس سرور را وارد نمایید.',
             enterFormId: 'شناسه‌ی فرم را وارد نمایید.'
         },
         en: {
@@ -36,12 +42,15 @@
             floatRight: 'left',
             modalTitle: '<span style="color: #03a9f4">Ravesh</span> Form Builder',
             modalDescription: 'Connect Ravesh Form Builder & wordpress',
+            modalTitle2: '<span style="color: #03a9f4">Formican</span> Form Builder',
+            modalDescription2: 'Connect Formican & wordpress',
             showTypeInline: 'Inline',
             showTypeDialog: 'Show Dialog',
             showTypeLink: 'Link',
             showTypeFab: 'Float Action Button',
             serverUrl: 'Server Url',
             domain: 'Domain',
+            domain2: 'Secret code',
             formId: 'Form Id',
             showType: 'Show Type',
             linkTitle: 'Title',
@@ -49,6 +58,7 @@
             create: 'Create',
             viewForm: 'View form',
             enterDomain: 'Please enter domain',
+            enterDomain2: 'Please enter Secret code',
             enterServerUrl: 'Please enter server url',
             enterFormId: 'Please enter form id'
         }
@@ -59,7 +69,7 @@
     //Style -----------------------
     var mainCss =
         '.rvc-modal {display: none;position: fixed;z-index: 99999;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0, 0, 0, 0.4);}' +
-        '.rvc-modal-content {background-color: #fefefe;margin: 15% auto;padding: 20px;border: 1px solid #888;width: 335px;font-family: tahoma;}' +
+        '.rvc-modal-content {background-color: #fefefe;margin: 25% auto;padding: 20px;border: 1px solid #888;width: 335px;font-family: tahoma;}' +
         '.rvc-close {color: #aaa;float: ' + res.floatLeft + ';font-size: 28px;font-weight: bold;}' +
         '.rvc-modal-title {font-size: 18px;}' +
         '.rvc-modal-detail {color: gray;margin: 5px 0 20px;}' +
@@ -86,8 +96,8 @@
 
 
     //Configuration Elements -----------------------
-    modalTitle.innerHTML = res.modalTitle;
-    modalDescription.innerHTML = res.modalDescription;
+    modalTitle.innerHTML = isCRM ? res.modalTitle : res.modalTitle2;
+    modalDescription.innerHTML = isCRM ? res.modalDescription : res.modalDescription2;
     btnClose.innerHTML = '&times;';
     modal.setAttribute('dir', res.dir);
     txtServerUrl.setAttribute('type', 'text');
@@ -99,6 +109,7 @@
     txtLinkTitle.value = res.viewForm;
     btnCreateCode.setAttribute('type', 'submit');
     btnCreateCode.value = res.create;
+
 
     var arrShowType = [['inline', res.showTypeInline], ['dialog', res.showTypeDialog], ['link', res.showTypeLink], ['fab', res.showTypeFab]]
     for (var index in arrShowType) {
@@ -121,9 +132,15 @@
         rvc.appendChilds(row, [span, elem]);
         return row;
     };
+
+    if (isCRM) {
+        rvc.appendChilds(modalContent, [
+            createRow(res.serverUrl, txtServerUrl)
+        ]);
+    }
+
     rvc.appendChilds(modalContent, [
-        createRow(res.serverUrl, txtServerUrl),
-        createRow(res.domain, txtDomain),
+        createRow(isCRM ? res.domain : res.domain2, txtDomain),
         createRow(res.formId, txtFormId),
         createRow(res.showType, drdShowType),
         createRow(res.linkTitle, txtLinkTitle),
@@ -145,33 +162,44 @@
     //Editor Configuration -----------------------
     tinymce.PluginManager.add('my_mce_button', function (editor, url) {
         editor.addButton('my_mce_button', {
-            icon: true, title: res.iconTitle, image: iconUrl,
+            icon: true, title: res.iconTitle, image: iconUrl, text: ' Form ',
             onclick: function () {
                 rvc.show(modal);
 
                 btnCreateCode.onclick = function () {
                     if (txtDomain.value.toString() === "") {
-                        alert(res.enterDomain);
+                        alert(isCRM ? res.enterDomain : res.enterDomain2);
                         txtDomain.focus();
-                    } else if (txtServerUrl.value.toString() === "") {
+                    } else if (txtServerUrl.value.toString() === "" && isCRM) {
                         alert(res.enterServerUrl);
                         txtServerUrl.focus();
                     } else if (txtFormId.value.toString() === "") {
                         alert(res.enterFormId);
                         txtFormId.focus();
                     } else {
-                        editor.insertContent(
-                            '[RaveshForm ' +
-                            'server="' + txtServerUrl.value.toString() + '" ' +
-                            'domain="' + txtDomain.value.toString() + '" ' +
-                            'formid="' + txtFormId.value.toString() + '" ' +
-                            'type="' + drdShowType.options[drdShowType.selectedIndex].value.toString() + '" ' +
-                            'title="' + txtLinkTitle.value.toString() + '" ' +
-                            ']');
+                        var shortCode = '';
+                        if (isCRM) {
+                            shortCode = '[RaveshForm ' +
+                                            'server="' + txtServerUrl.value.toString() + '" ' +
+                                            'domain="' + txtDomain.value.toString() + '" ' +
+                                            'formid="' + txtFormId.value.toString() + '" ' +
+                                            'type="' + drdShowType.options[drdShowType.selectedIndex].value.toString() + '" ' +
+                                            'title="' + txtLinkTitle.value.toString() + '" ' +
+                                        ']';
+                        } else {
+                            shortCode = '[' + (isFormican ? 'Formican' : 'FormAfzar') + ' ' +
+                                            'secretcode="' + txtDomain.value.toString() + '" ' +
+                                            'formid="' + txtFormId.value.toString() + '" ' +
+                                            'type="' + drdShowType.options[drdShowType.selectedIndex].value.toString() + '" ' +
+                                            'title="' + txtLinkTitle.value.toString() + '" ' +
+                                        ']';
+                        }
+                        editor.insertContent(shortCode);
                         document.cookie = "server=" + txtServerUrl.value.toString();
                         document.cookie = "domain=" + txtDomain.value.toString();
                         rvc.hide(modal);
                     }
+
                 }
             }
         });

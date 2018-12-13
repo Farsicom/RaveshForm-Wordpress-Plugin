@@ -1,11 +1,16 @@
 <?php
-/* 
-Plugin Name: فرم‌ساز رَوش
-Plugin URI: FarsiCom.com
+
+    /*
+Plugin Name: Ravesh Form Builder 
+Plugin URI: raveshcrm.com
 Version: v1.0
-Author: <a href="http://FarsiCom.com/">فارسیکام</a>
-Description: افزونه نمایش  <b><a href="http://raveshcrm.ir/">فرم‌ساز رَوش</a></b> در وردپرس
+Author: <a href="https://raveshcrm.com/">raveshcrm</a>
+Description: View plugin  <b><a href="http://raveshcrm.ir/">Ravesh Form Builder</a></b> In wordpress
 */
+
+
+$RaveshFormIsCRM='false';
+$RaveshFormIsFormican='false';
 
 if (!class_exists("CrmPluginSeries")) {
     class CrmPluginSeries
@@ -26,15 +31,32 @@ if (isset($dl_pluginSeries)) {
 
     function replaceShortCode($atts)
     {
+        $isCRM=$GLOBALS['RaveshFormIsCRM'];
+        $isFormican=$GLOBALS['RaveshFormIsFormican'];
+        $comment="";
+        
         extract(shortcode_atts(array(
             "server" => 'http://',
             "domain" => '',
+            "secretcode" => '',
             "formid" => '0',
             "type" => 'inline',
-            "title" => 'مشاهده‌ی فرم'
+            "title" => 'View Form'
         ), $atts));
 
-        if (substr($server, -1) != "/") $server = $server . "/";
+        if ($isCRM=="true"){
+          if (substr($server, -1) != "/") $server = $server . "/";
+          $comment="RAVESH FORM BUILDER ---- RAVESHCRM.IR";
+        }else{
+          if ($isFormican=="true") {
+            $server = "http://Formican.com/";
+            $comment="FORMICAN FORM BUILDER ---- FORMICAN.COM";
+          }else{
+            $server = "http://FormAfzar.com/";
+            $comment="FORMAFZAR FORM BUILDER ---- FORMAFZAR.COM";
+          }
+          $domain=$secretcode;
+        }
         $scriptUrl = $server . "pages/formbuilder/ravesh-formbuilder.js";
         $formUrl = $server . $domain . "/formView/" . $formid;
 
@@ -48,12 +70,14 @@ if (isset($dl_pluginSeries)) {
         } else if ($type == "link") {
             $result .= "<a href=\"" . $formUrl . "\" target=\"_blank\">" . $title . "</a>";
         }
-        $result = "\n<!--START---- RAVESH FORM BUILDER ---- RAVESHCRM.IR ----->\n" . $result . "\n<!--END--- RAVESH FORM BUILDER ---- RAVESHCRM.IR ----->\n";
+        $result = "\n<!--START---- $comment ----->\n" . $result . "\n<!--END--- $comment ----->\n";
 
         return $result;
     }
 
     add_shortcode('RaveshForm', 'replaceShortCode');
+    add_shortcode('FormAfzar', 'replaceShortCode');
+    add_shortcode('Formican', 'replaceShortCode');
     function add_ravesh_button_to_mce()
     {
         // check user permissions
@@ -72,10 +96,10 @@ if (isset($dl_pluginSeries)) {
     {
 
         $language=get_locale();
-        $iconUrl=plugins_url( 'RaveshForm_logo.png', __FILE__ );
-
-        echo "<script type='text/javascript'>var IconUrlPosted='$iconUrl'</script>";
-        echo "<script type='text/javascript'>var languagePosted='$language'</script>";
+        $iconUrl=plugins_url('/', __FILE__ );
+        $isCRM=$GLOBALS['RaveshFormIsCRM'];
+        $isFormican=$GLOBALS['RaveshFormIsFormican'];
+        echo "<script type='text/javascript'>var RaveshFormPath='$iconUrl';var RaveshFormLang='$language';var RaveshFormIsCRM='$isCRM';var RaveshFormIsFormican='$isFormican'</script>";
 
 
          $plugin_array['my_mce_button'] =plugins_url( 'RaveshForm_mce_button.js', __FILE__ );
